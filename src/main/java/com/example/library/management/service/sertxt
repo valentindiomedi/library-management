@@ -1,0 +1,59 @@
+package com.example.library.management.service;
+
+
+
+
+
+
+
+
+Regla importante:
+
+Un Service puede usar varios repositories si la lógica lo nrequiere
+
+
+
+import com.example.library.management.domain.User;
+import com.example.library.management.domain.UserStatus;
+import com.example.library.management.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.UUID;
+
+@Service
+@RequiredArgsConstructor
+public class UserService {
+
+    private final UserRepository userRepository;
+
+    public User createUser(User user) {
+        if (userRepository.existsByEmail(user.getEmail())) {
+            throw new IllegalArgumentException("Email already exists");
+        }
+
+        user.setStatus(UserStatus.ACTIVE);
+        return userRepository.save(user);
+    }
+
+    public User getUserById(UUID id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+    }
+
+    public User getActiveUserByEmail(String email) {
+        return userRepository.findByEmailAndStatus(email, UserStatus.ACTIVE)
+                .orElseThrow(() -> new IllegalArgumentException("Active user not found"));
+    }
+
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
+    }
+
+    public void deactivateUser(UUID id) {
+        User user = getUserById(id);
+        user.setStatus(UserStatus.INACTIVE);
+        userRepository.save(user);
+    }
+}
