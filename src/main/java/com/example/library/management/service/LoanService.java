@@ -12,6 +12,7 @@ import com.example.library.management.repository.LoanRepository;
 import com.example.library.management.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -26,6 +27,7 @@ public class LoanService {
     private final BookRepository bookRepository;
     private final LoanMapper loanMapper;
 
+    @Transactional
     public LoanResponseDTO create(LoanRequestDTO request) {
 
         User user = userRepository.findById(request.getUserId())
@@ -39,7 +41,6 @@ public class LoanService {
         }
 
         book.setAvailableQuantity(book.getAvailableQuantity() - 1);
-        bookRepository.save(book);
 
         Loan loan = Loan.builder()
                 .user(user)
@@ -49,7 +50,9 @@ public class LoanService {
                 .status(LoanStatus.ACTIVE)
                 .build();
 
-        return loanMapper.toResponse(loanRepository.save(loan));
+        Loan savedLoan = loanRepository.save(loan);
+
+        return loanMapper.toResponse(savedLoan);
     }
 
     public LoanResponseDTO getById(UUID id) {
@@ -65,6 +68,7 @@ public class LoanService {
                 .toList();
     }
 
+    @Transactional
     public LoanResponseDTO returnBook(UUID id) {
 
         Loan loan = loanRepository.findById(id)
@@ -79,8 +83,7 @@ public class LoanService {
 
         Book book = loan.getBook();
         book.setAvailableQuantity(book.getAvailableQuantity() + 1);
-        bookRepository.save(book);
 
-        return loanMapper.toResponse(loanRepository.save(loan));
+        return loanMapper.toResponse(loan);
     }
 }
