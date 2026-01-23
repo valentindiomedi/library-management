@@ -7,6 +7,8 @@ import com.example.library.management.mapper.AuthorMapper;
 import com.example.library.management.repository.AuthorRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import com.example.library.management.dto.AuthorPatchDTO;
 
 import java.util.List;
 import java.util.UUID;
@@ -41,5 +43,30 @@ public class AuthorService {
             throw new IllegalArgumentException("Author not found");
         }
         authorRepository.deleteById(id);
+    }
+
+    @Transactional
+    public AuthorResponseDTO patch(UUID id, AuthorPatchDTO request) {
+
+        Author author = authorRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Author not found"));
+
+        if (request.getFirstName() != null) {
+            author.setFirstName(request.getFirstName());
+        }
+
+        if (request.getLastName() != null) {
+            author.setLastName(request.getLastName());
+        }
+
+        if (request.getNationality() != null) {
+            author.setNationality(request.getNationality());
+        }
+
+        if (request.getBiography() != null) {
+            author.setBiography(request.getBiography());
+        }
+
+        return authorMapper.toResponse(author);
     }
 }

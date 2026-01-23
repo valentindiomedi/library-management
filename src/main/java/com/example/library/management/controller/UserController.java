@@ -3,26 +3,31 @@ package com.example.library.management.controller;
 import com.example.library.management.dto.UserRequestDTO;
 import com.example.library.management.dto.UserResponseDTO;
 import com.example.library.management.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.example.library.management.dto.UserPatchDTO;
 
 import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/api/users")
 @RequiredArgsConstructor
 public class UserController {
 
     private final UserService userService;
 
     @PostMapping
-    public ResponseEntity<UserResponseDTO> create(@RequestBody UserRequestDTO request) {
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(userService.create(request));
+    public ResponseEntity<UserResponseDTO> create(
+            @Valid @RequestBody UserRequestDTO request
+    ) {
+        return new ResponseEntity<>(
+                userService.create(request),
+                HttpStatus.CREATED
+        );
     }
 
     @GetMapping("/{id}")
@@ -39,5 +44,13 @@ public class UserController {
     public ResponseEntity<Void> delete(@PathVariable UUID id) {
         userService.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<UserResponseDTO> patch(
+            @PathVariable UUID id,
+            @Valid @RequestBody UserPatchDTO request
+    ) {
+        return ResponseEntity.ok(userService.patch(id, request));
     }
 }

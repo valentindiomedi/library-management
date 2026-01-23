@@ -8,6 +8,8 @@ import com.example.library.management.mapper.UserMapper;
 import com.example.library.management.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import com.example.library.management.dto.UserPatchDTO;
+import jakarta.transaction.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -43,5 +45,26 @@ public class UserService {
             throw new IllegalArgumentException("User not found");
         }
         userRepository.deleteById(id);
+    }
+
+    @Transactional
+    public UserResponseDTO patch(UUID id, UserPatchDTO request) {
+
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        if (request.getName() != null) {
+            user.setName(request.getName());
+        }
+
+        if (request.getEmail() != null) {
+            user.setEmail(request.getEmail());
+        }
+
+        if (request.getPhone() != null) {
+            user.setPhone(request.getPhone());
+        }
+
+        return userMapper.toResponse(user);
     }
 }

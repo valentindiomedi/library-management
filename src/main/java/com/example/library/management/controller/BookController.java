@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.example.library.management.dto.BookPatchDTO;
 
 import java.util.List;
 import java.util.UUID;
@@ -43,4 +44,20 @@ public class BookController {
     public ResponseEntity<BookResponseDTO> getByIsbn(@PathVariable String isbn) {
         return ResponseEntity.ok(bookService.getByIsbn(isbn));
     }
+
+    public ResponseEntity<BookResponseDTO> update(
+            @PathVariable UUID id,
+            @Valid @RequestBody BookRequestDTO request
+    ) {
+        return ResponseEntity.ok(bookService.update(id, request));
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<BookResponseDTO> patch(
+            @PathVariable UUID id,
+            @Valid @RequestBody BookPatchDTO request
+    ) {
+        return ResponseEntity.ok(bookService.patch(id, request));
+    }
+
 }
