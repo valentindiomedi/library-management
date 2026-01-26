@@ -30,6 +30,7 @@ public class BookMapper {
                 .totalQuantity(book.getTotalQuantity())
                 .availableQuantity(book.getAvailableQuantity())
                 .location(book.getLocation())
+                .status(book.getStatus())
                 .authorId(book.getAuthor().getId())
                 .authorFullName(
                         book.getAuthor().getFirstName() + " " +

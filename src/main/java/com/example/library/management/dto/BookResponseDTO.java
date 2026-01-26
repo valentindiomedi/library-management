@@ -1,5 +1,6 @@
 package com.example.library.management.dto;
 
+import com.example.library.management.domain.BookStatus;
 import lombok.*;
 
 import java.util.UUID;
@@ -25,4 +26,7 @@ public class BookResponseDTO {
     private Integer availableQuantity;
 
     private String location;
+
+
+    private BookStatus status;
 }
