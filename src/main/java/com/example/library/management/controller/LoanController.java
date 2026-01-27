@@ -8,6 +8,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.UUID;
@@ -32,9 +35,24 @@ public class LoanController {
         return ResponseEntity.ok(loanService.getById(id));
     }
 
+    // ========================= GET ALL (PAGINADO) =========================
     @GetMapping
-    public ResponseEntity<List<LoanResponseDTO>> getAll() {
-        return ResponseEntity.ok(loanService.getAll());
+    public ResponseEntity<Page<LoanResponseDTO>> getAll(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        return ResponseEntity.ok(loanService.getAll(pageable));
+    }
+
+    // ========================= GET ACTIVE (PAGINADO) =========================
+    @GetMapping("/active")
+    public ResponseEntity<Page<LoanResponseDTO>> getActiveLoans(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        return ResponseEntity.ok(loanService.getActiveLoans(pageable));
     }
 
     @PutMapping("/{id}/return")

@@ -16,6 +16,8 @@ import com.example.library.management.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -29,6 +31,7 @@ public class LoanService {
     private final UserRepository userRepository;
     private final BookRepository bookRepository;
     private final LoanMapper loanMapper;
+
 
     // ========================= CREATE LOAN =========================
     @Transactional
@@ -86,12 +89,18 @@ public class LoanService {
                 );
     }
 
-    // ========================= GET ALL =========================
-    public List<LoanResponseDTO> getAll() {
-        return loanRepository.findAll()
-                .stream()
-                .map(loanMapper::toResponse)
-                .toList();
+    // ========================= GET ALL (PAGINADO) =========================
+    public Page<LoanResponseDTO> getAll(Pageable pageable) {
+        return loanRepository
+                .findAll(pageable)
+                .map(loanMapper::toResponse);
+    }
+
+    // ========================= GET ACTIVE LOANS (PAGINADO) =========================
+    public Page<LoanResponseDTO> getActiveLoans(Pageable pageable) {
+        return loanRepository
+                .findByStatus(LoanStatus.ACTIVE, pageable)
+                .map(loanMapper::toResponse);
     }
 
     // ========================= RETURN BOOK =========================

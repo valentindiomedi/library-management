@@ -9,6 +9,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.example.library.management.dto.BookPatchDTO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 
 import java.util.List;
 import java.util.UUID;
@@ -36,8 +39,8 @@ public class BookController {
     }
 
     @GetMapping
-    public ResponseEntity<List<BookResponseDTO>> getAll() {
-        return ResponseEntity.ok(bookService.getAll());
+    public ResponseEntity<Page<BookResponseDTO>> getAll(Pageable pageable) {
+        return ResponseEntity.ok(bookService.getAll(pageable));
     }
 
     @GetMapping("/isbn/{isbn}")
@@ -45,6 +48,8 @@ public class BookController {
         return ResponseEntity.ok(bookService.getByIsbn(isbn));
     }
 
+
+    @PutMapping("/{id}")
     public ResponseEntity<BookResponseDTO> update(
             @PathVariable UUID id,
             @Valid @RequestBody BookRequestDTO request

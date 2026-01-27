@@ -10,6 +10,8 @@ import com.example.library.management.repository.AuthorRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.UUID;
@@ -37,11 +39,9 @@ public class AuthorService {
     }
 
     // ========================= GET ALL =========================
-    public List<AuthorResponseDTO> getAll() {
-        return authorRepository.findAll()
-                .stream()
-                .map(authorMapper::toResponse)
-                .toList();
+    public Page<AuthorResponseDTO> getAll(Pageable pageable) {
+        return authorRepository.findAll(pageable)
+                .map(authorMapper::toResponse);
     }
 
     // ========================= DELETE =========================

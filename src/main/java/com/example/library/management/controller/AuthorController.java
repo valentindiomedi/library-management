@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.example.library.management.dto.AuthorPatchDTO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.UUID;
@@ -35,8 +37,8 @@ public class AuthorController {
     }
 
     @GetMapping
-    public ResponseEntity<List<AuthorResponseDTO>> getAll() {
-        return ResponseEntity.ok(authorService.getAll());
+    public ResponseEntity<Page<AuthorResponseDTO>> getAll(Pageable pageable) {
+        return ResponseEntity.ok(authorService.getAll(pageable));
     }
 
     @DeleteMapping("/{id}")

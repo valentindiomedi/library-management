@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.example.library.management.dto.UserPatchDTO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.UUID;
@@ -36,8 +38,8 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<List<UserResponseDTO>> getAll() {
-        return ResponseEntity.ok(userService.getAll());
+    public ResponseEntity<Page<UserResponseDTO>> getAll(Pageable pageable) {
+        return ResponseEntity.ok(userService.getAll(pageable));
     }
 
     @DeleteMapping("/{id}")
