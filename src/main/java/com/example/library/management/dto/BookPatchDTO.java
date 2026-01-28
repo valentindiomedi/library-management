@@ -21,10 +21,9 @@ public class BookPatchDTO {
 
     private String category;
 
-    @Min(value = 0, message = "Total quantity cannot be negative")
+
     private Integer totalQuantity;
 
-    @Min(value = 0, message = "Available quantity cannot be negative")
     private Integer availableQuantity;
 
     private String location;

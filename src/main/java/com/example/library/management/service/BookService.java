@@ -16,6 +16,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import com.example.library.management.domain.LoanStatus;
+import com.example.library.management.repository.LoanRepository;
+import com.example.library.management.service.LoanService;
+
 
 
 import java.util.List;
@@ -28,6 +32,8 @@ public class BookService {
     private final BookRepository bookRepository;
     private final AuthorRepository authorRepository;
     private final BookMapper bookMapper;
+    private final LoanService loanService;
+
 
     // ========================= CREATE =========================
     public BookResponseDTO create(BookRequestDTO request) {
@@ -141,4 +147,25 @@ public class BookService {
 
         return bookMapper.toResponse(bookRepository.save(book));
     }
+
+    // ========================= DELETE =========================
+    @Transactional
+    public void delete(UUID id) {
+
+        Book book = bookRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Book not found")
+                );
+
+        boolean hasActiveLoans = loanService.hasActiveLoans(book);
+
+        if (hasActiveLoans) {
+            throw new BadRequestException(
+                    "Cannot delete book with active loans"
+            );
+        }
+
+        bookRepository.delete(book);
+    }
+
 }

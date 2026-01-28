@@ -103,6 +103,12 @@ public class LoanService {
                 .map(loanMapper::toResponse);
     }
 
+
+    // ========================= VALIDATIONS =========================
+    public boolean hasActiveLoans(Book book) {
+        return loanRepository.existsByBookAndStatus(book, LoanStatus.ACTIVE);
+    }
+
     // ========================= RETURN BOOK =========================
     @Transactional
     public LoanResponseDTO returnBook(UUID id) {

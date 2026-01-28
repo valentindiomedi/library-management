@@ -3,6 +3,7 @@ package com.example.library.management.repository;
 import com.example.library.management.domain.Author;
 import com.example.library.management.domain.Book;
 import org.springframework.data.jpa.repository.JpaRepository;
+import com.example.library.management.domain.LoanStatus;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,4 +18,7 @@ public interface BookRepository extends JpaRepository<Book, UUID> {
     List<Book> findByAuthor(Author author);
 
     List<Book> findByCategory(String category);
+
+    boolean existsByBookAndStatus(Book book, LoanStatus status);
+
 }
