@@ -7,7 +7,8 @@ import com.example.library.management.dto.BookPatchDTO;
 import com.example.library.management.dto.BookRequestDTO;
 import com.example.library.management.dto.BookResponseDTO;
 import com.example.library.management.exception.BadRequestException;
-import com.example.library.management.exception.ResourceNotFoundException;
+import com.example.library.management.exception.AuthorNotFoundException;
+import com.example.library.management.exception.BookNotFoundException;
 import com.example.library.management.mapper.BookMapper;
 import com.example.library.management.repository.AuthorRepository;
 import com.example.library.management.repository.BookRepository;
@@ -16,13 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import com.example.library.management.domain.LoanStatus;
-import com.example.library.management.repository.LoanRepository;
-import com.example.library.management.service.LoanService;
 
-
-
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -34,14 +29,11 @@ public class BookService {
     private final BookMapper bookMapper;
     private final LoanService loanService;
 
-
     // ========================= CREATE =========================
     public BookResponseDTO create(BookRequestDTO request) {
 
         Author author = authorRepository.findById(request.getAuthorId())
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Author not found")
-                );
+                .orElseThrow(AuthorNotFoundException::new);
 
         Book book = bookMapper.toEntity(request, author);
         book.setStatus(BookStatus.AVAILABLE);
@@ -53,9 +45,7 @@ public class BookService {
     public BookResponseDTO getById(UUID id) {
         return bookRepository.findById(id)
                 .map(bookMapper::toResponse)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Book not found")
-                );
+                .orElseThrow(BookNotFoundException::new);
     }
 
     // ========================= GET ALL =========================
@@ -64,28 +54,21 @@ public class BookService {
                 .map(bookMapper::toResponse);
     }
 
-
     // ========================= GET BY ISBN =========================
     public BookResponseDTO getByIsbn(String isbn) {
         return bookRepository.findByIsbn(isbn)
                 .map(bookMapper::toResponse)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Book not found")
-                );
+                .orElseThrow(BookNotFoundException::new);
     }
 
     // ========================= UPDATE (PUT) =========================
     public BookResponseDTO update(UUID id, BookRequestDTO request) {
 
         Book book = bookRepository.findById(id)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Book not found")
-                );
+                .orElseThrow(BookNotFoundException::new);
 
         Author author = authorRepository.findById(request.getAuthorId())
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Author not found")
-                );
+                .orElseThrow(AuthorNotFoundException::new);
 
         book.setTitle(request.getTitle());
         book.setAuthor(author);
@@ -103,9 +86,7 @@ public class BookService {
     public BookResponseDTO patch(UUID id, BookPatchDTO request) {
 
         Book book = bookRepository.findById(id)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Book not found")
-                );
+                .orElseThrow(BookNotFoundException::new);
 
         if (request.getTitle() != null) {
             book.setTitle(request.getTitle());
@@ -139,9 +120,7 @@ public class BookService {
 
         if (request.getAuthorId() != null) {
             Author author = authorRepository.findById(request.getAuthorId())
-                    .orElseThrow(() ->
-                            new ResourceNotFoundException("Author not found")
-                    );
+                    .orElseThrow(AuthorNotFoundException::new);
             book.setAuthor(author);
         }
 
@@ -153,19 +132,14 @@ public class BookService {
     public void delete(UUID id) {
 
         Book book = bookRepository.findById(id)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Book not found")
-                );
+                .orElseThrow(BookNotFoundException::new);
 
         boolean hasActiveLoans = loanService.hasActiveLoans(book);
 
         if (hasActiveLoans) {
-            throw new BadRequestException(
-                    "Cannot delete book with active loans"
-            );
+            throw new BadRequestException("Cannot delete book with active loans");
         }
 
         bookRepository.delete(book);
     }
-
 }

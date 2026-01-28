@@ -8,7 +8,9 @@ import com.example.library.management.domain.User;
 import com.example.library.management.dto.LoanRequestDTO;
 import com.example.library.management.dto.LoanResponseDTO;
 import com.example.library.management.exception.BadRequestException;
-import com.example.library.management.exception.ResourceNotFoundException;
+import com.example.library.management.exception.BookNotFoundException;
+import com.example.library.management.exception.LoanNotFoundException;
+import com.example.library.management.exception.UserNotFoundException;
 import com.example.library.management.mapper.LoanMapper;
 import com.example.library.management.repository.BookRepository;
 import com.example.library.management.repository.LoanRepository;
@@ -20,7 +22,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -32,20 +33,15 @@ public class LoanService {
     private final BookRepository bookRepository;
     private final LoanMapper loanMapper;
 
-
     // ========================= CREATE LOAN =========================
     @Transactional
     public LoanResponseDTO create(LoanRequestDTO request) {
 
         User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("User not found")
-                );
+                .orElseThrow(UserNotFoundException::new);
 
         Book book = bookRepository.findById(request.getBookId())
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Book not found")
-                );
+                .orElseThrow(BookNotFoundException::new);
 
         // Validación por estado
         if (book.getStatus() != BookStatus.AVAILABLE) {
@@ -84,9 +80,7 @@ public class LoanService {
     public LoanResponseDTO getById(UUID id) {
         return loanRepository.findById(id)
                 .map(loanMapper::toResponse)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Loan not found")
-                );
+                .orElseThrow(LoanNotFoundException::new);
     }
 
     // ========================= GET ALL (PAGINADO) =========================
@@ -103,7 +97,6 @@ public class LoanService {
                 .map(loanMapper::toResponse);
     }
 
-
     // ========================= VALIDATIONS =========================
     public boolean hasActiveLoans(Book book) {
         return loanRepository.existsByBookAndStatus(book, LoanStatus.ACTIVE);
@@ -114,9 +107,7 @@ public class LoanService {
     public LoanResponseDTO returnBook(UUID id) {
 
         Loan loan = loanRepository.findById(id)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Loan not found")
-                );
+                .orElseThrow(LoanNotFoundException::new);
 
         if (loan.getStatus() == LoanStatus.RETURNED) {
             throw new BadRequestException("Loan already returned");

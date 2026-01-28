@@ -5,7 +5,7 @@ import com.example.library.management.domain.UserStatus;
 import com.example.library.management.dto.UserPatchDTO;
 import com.example.library.management.dto.UserRequestDTO;
 import com.example.library.management.dto.UserResponseDTO;
-import com.example.library.management.exception.ResourceNotFoundException;
+import com.example.library.management.exception.UserNotFoundException;
 import com.example.library.management.mapper.UserMapper;
 import com.example.library.management.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -35,9 +34,7 @@ public class UserService {
     public UserResponseDTO getById(UUID id) {
         return userRepository.findById(id)
                 .map(userMapper::toResponse)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("User not found")
-                );
+                .orElseThrow(UserNotFoundException::new);
     }
 
     // ========================= GET ALL =========================
@@ -45,10 +42,11 @@ public class UserService {
         return userRepository.findAll(pageable)
                 .map(userMapper::toResponse);
     }
+
     // ========================= DELETE =========================
     public void delete(UUID id) {
         if (!userRepository.existsById(id)) {
-            throw new ResourceNotFoundException("User not found");
+            throw new UserNotFoundException();
         }
         userRepository.deleteById(id);
     }
@@ -58,9 +56,7 @@ public class UserService {
     public UserResponseDTO patch(UUID id, UserPatchDTO request) {
 
         User user = userRepository.findById(id)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("User not found")
-                );
+                .orElseThrow(UserNotFoundException::new);
 
         if (request.getName() != null) {
             user.setName(request.getName());

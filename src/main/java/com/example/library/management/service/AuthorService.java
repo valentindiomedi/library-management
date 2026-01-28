@@ -4,7 +4,7 @@ import com.example.library.management.domain.Author;
 import com.example.library.management.dto.AuthorPatchDTO;
 import com.example.library.management.dto.AuthorRequestDTO;
 import com.example.library.management.dto.AuthorResponseDTO;
-import com.example.library.management.exception.ResourceNotFoundException;
+import com.example.library.management.exception.AuthorNotFoundException;
 import com.example.library.management.mapper.AuthorMapper;
 import com.example.library.management.repository.AuthorRepository;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -33,9 +32,7 @@ public class AuthorService {
     public AuthorResponseDTO getById(UUID id) {
         return authorRepository.findById(id)
                 .map(authorMapper::toResponse)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Author not found")
-                );
+                .orElseThrow(AuthorNotFoundException::new);
     }
 
     // ========================= GET ALL =========================
@@ -47,7 +44,7 @@ public class AuthorService {
     // ========================= DELETE =========================
     public void delete(UUID id) {
         if (!authorRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Author not found");
+            throw new AuthorNotFoundException();
         }
         authorRepository.deleteById(id);
     }
@@ -57,9 +54,7 @@ public class AuthorService {
     public AuthorResponseDTO patch(UUID id, AuthorPatchDTO request) {
 
         Author author = authorRepository.findById(id)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Author not found")
-                );
+                .orElseThrow(AuthorNotFoundException::new);
 
         if (request.getFirstName() != null) {
             author.setFirstName(request.getFirstName());
