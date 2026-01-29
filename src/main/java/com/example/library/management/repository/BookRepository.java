@@ -2,10 +2,11 @@ package com.example.library.management.repository;
 
 import com.example.library.management.domain.Author;
 import com.example.library.management.domain.Book;
+import com.example.library.management.domain.BookStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
-import com.example.library.management.domain.LoanStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -15,10 +16,23 @@ public interface BookRepository extends JpaRepository<Book, UUID> {
 
     boolean existsByIsbn(String isbn);
 
-    List<Book> findByAuthor(Author author);
+    // ========================= FILTERS (PAGINATED) =========================
 
-    List<Book> findByCategory(String category);
+    Page<Book> findByAuthor(Author author, Pageable pageable);
 
-    boolean existsByBookAndStatus(Book book, LoanStatus status);
+    Page<Book> findByCategory(String category, Pageable pageable);
 
+    Page<Book> findByStatus(BookStatus status, Pageable pageable);
+
+    Page<Book> findByAuthorAndStatus(
+            Author author,
+            BookStatus status,
+            Pageable pageable
+    );
+
+    Page<Book> findByCategoryAndStatus(
+            String category,
+            BookStatus status,
+            Pageable pageable
+    );
 }

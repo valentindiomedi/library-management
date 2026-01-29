@@ -12,12 +12,14 @@ import com.example.library.management.exception.BookNotFoundException;
 import com.example.library.management.mapper.BookMapper;
 import com.example.library.management.repository.AuthorRepository;
 import com.example.library.management.repository.BookRepository;
+import com.example.library.management.service.LoanService;
+import com.example.library.management.service.AuthorService;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-
 import java.util.UUID;
 
 @Service
@@ -28,6 +30,7 @@ public class BookService {
     private final AuthorRepository authorRepository;
     private final BookMapper bookMapper;
     private final LoanService loanService;
+    private final AuthorService authorService;
 
     // ========================= CREATE =========================
     public BookResponseDTO create(BookRequestDTO request) {
@@ -142,4 +145,50 @@ public class BookService {
 
         bookRepository.delete(book);
     }
+
+    // ========================= FILTERED SEARCH =========================
+    public Page<BookResponseDTO> search(
+            UUID authorId,
+            String category,
+            BookStatus status,
+            Pageable pageable
+    ) {
+
+        if (authorId != null && status != null) {
+            Author author = authorService.getEntityById(authorId);
+            return bookRepository
+                    .findByAuthorAndStatus(author, status, pageable)
+                    .map(bookMapper::toResponse);
+        }
+
+        if (authorId != null) {
+            Author author = authorService.getEntityById(authorId);
+            return bookRepository
+                    .findByAuthor(author, pageable)
+                    .map(bookMapper::toResponse);
+        }
+
+        if (category != null && status != null) {
+            return bookRepository
+                    .findByCategoryAndStatus(category, status, pageable)
+                    .map(bookMapper::toResponse);
+        }
+
+        if (category != null) {
+            return bookRepository
+                    .findByCategory(category, pageable)
+                    .map(bookMapper::toResponse);
+        }
+
+        if (status != null) {
+            return bookRepository
+                    .findByStatus(status, pageable)
+                    .map(bookMapper::toResponse);
+        }
+
+        return bookRepository
+                .findAll(pageable)
+                .map(bookMapper::toResponse);
+    }
+
 }

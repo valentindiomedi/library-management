@@ -49,6 +49,12 @@ public class AuthorService {
         authorRepository.deleteById(id);
     }
 
+    public Author getEntityById(UUID id) {
+        return authorRepository.findById(id)
+                .orElseThrow(AuthorNotFoundException::new);
+    }
+
+
     // ========================= PATCH =========================
     @Transactional
     public AuthorResponseDTO patch(UUID id, AuthorPatchDTO request) {

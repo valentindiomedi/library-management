@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import com.example.library.management.domain.LoanStatus;
 
 import java.util.List;
 import java.util.UUID;
@@ -26,8 +27,9 @@ public class LoanController {
     public ResponseEntity<LoanResponseDTO> create(
             @Valid @RequestBody LoanRequestDTO request
     ) {
-        LoanResponseDTO response = loanService.create(request);
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(loanService.create(request));
     }
 
     @GetMapping("/{id}")
@@ -37,21 +39,13 @@ public class LoanController {
 
     // ========================= GET ALL (PAGINADO) =========================
     @GetMapping
-    public ResponseEntity<Page<LoanResponseDTO>> getAll(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
-    ) {
-        Pageable pageable = PageRequest.of(page, size);
+    public ResponseEntity<Page<LoanResponseDTO>> getAll(Pageable pageable) {
         return ResponseEntity.ok(loanService.getAll(pageable));
     }
 
     // ========================= GET ACTIVE (PAGINADO) =========================
     @GetMapping("/active")
-    public ResponseEntity<Page<LoanResponseDTO>> getActiveLoans(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
-    ) {
-        Pageable pageable = PageRequest.of(page, size);
+    public ResponseEntity<Page<LoanResponseDTO>> getActiveLoans(Pageable pageable) {
         return ResponseEntity.ok(loanService.getActiveLoans(pageable));
     }
 
@@ -59,4 +53,40 @@ public class LoanController {
     public ResponseEntity<LoanResponseDTO> returnBook(@PathVariable UUID id) {
         return ResponseEntity.ok(loanService.returnBook(id));
     }
+
+
+    // ========================= GET BY USER =========================
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<Page<LoanResponseDTO>> getByUser(
+            @PathVariable UUID userId,
+            Pageable pageable
+    ) {
+        return ResponseEntity.ok(
+                loanService.getByUser(userId, pageable)
+        );
+    }
+
+    // ========================= GET BY BOOK =========================
+    @GetMapping("/book/{bookId}")
+    public ResponseEntity<Page<LoanResponseDTO>> getByBook(
+            @PathVariable UUID bookId,
+            Pageable pageable
+    ) {
+        return ResponseEntity.ok(
+                loanService.getByBook(bookId, pageable)
+        );
+    }
+
+    // ========================= GET BY USER + STATUS =========================
+    @GetMapping("/user/{userId}/status/{status}")
+    public ResponseEntity<Page<LoanResponseDTO>> getByUserAndStatus(
+            @PathVariable UUID userId,
+            @PathVariable LoanStatus status,
+            Pageable pageable
+    ) {
+        return ResponseEntity.ok(
+                loanService.getByUserAndStatus(userId, status, pageable)
+        );
+    }
+
 }

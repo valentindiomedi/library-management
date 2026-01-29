@@ -126,4 +126,42 @@ public class LoanService {
 
         return loanMapper.toResponse(loan);
     }
+
+    // ========================= FILTER BY USER =========================
+    public Page<LoanResponseDTO> getByUser(UUID userId, Pageable pageable) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(UserNotFoundException::new);
+
+        return loanRepository
+                .findByUser(user, pageable)
+                .map(loanMapper::toResponse);
+    }
+
+    // ========================= FILTER BY BOOK =========================
+    public Page<LoanResponseDTO> getByBook(UUID bookId, Pageable pageable) {
+
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(BookNotFoundException::new);
+
+        return loanRepository
+                .findByBook(book, pageable)
+                .map(loanMapper::toResponse);
+    }
+
+    // ========================= FILTER BY USER + STATUS =========================
+    public Page<LoanResponseDTO> getByUserAndStatus(
+            UUID userId,
+            LoanStatus status,
+            Pageable pageable
+    ) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(UserNotFoundException::new);
+
+        return loanRepository
+                .findByUserAndStatus(user, status, pageable)
+                .map(loanMapper::toResponse);
+    }
+
 }

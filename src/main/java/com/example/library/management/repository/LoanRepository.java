@@ -8,21 +8,21 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.util.List;
 import java.util.UUID;
 
 public interface LoanRepository extends JpaRepository<Loan, UUID> {
 
-    List<Loan> findByUser(User user);
-
-    List<Loan> findByBook(Book book);
-
-    List<Loan> findByStatus(LoanStatus status);
-
-    List<Loan> findByUserAndStatus(User user, LoanStatus status);
-
-    boolean existsByBookAndStatus(Book book, LoanStatus status);
-
     Page<Loan> findByStatus(LoanStatus status, Pageable pageable);
 
+    Page<Loan> findByUser(User user, Pageable pageable);
+
+    Page<Loan> findByBook(Book book, Pageable pageable);
+
+    Page<Loan> findByUserAndStatus(
+            User user,
+            LoanStatus status,
+            Pageable pageable
+    );
+
+    boolean existsByBookAndStatus(Book book, LoanStatus status);
 }

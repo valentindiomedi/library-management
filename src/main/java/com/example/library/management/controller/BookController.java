@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import com.example.library.management.dto.BookPatchDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import com.example.library.management.domain.BookStatus;
 
 
 import java.util.List;
@@ -70,6 +71,20 @@ public class BookController {
         bookService.delete(id);
         return ResponseEntity.noContent().build();
     }
+
+
+    @GetMapping("/search")
+    public ResponseEntity<Page<BookResponseDTO>> search(
+            @RequestParam(required = false) UUID authorId,
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) BookStatus status,
+            Pageable pageable
+    ) {
+        return ResponseEntity.ok(
+                bookService.search(authorId, category, status, pageable)
+        );
+    }
+
 
 
 }
