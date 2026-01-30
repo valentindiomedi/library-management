@@ -2,13 +2,28 @@ package com.example.library.management.repository;
 
 import com.example.library.management.domain.Author;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
-import java.util.List;
 import java.util.UUID;
 
 public interface AuthorRepository extends JpaRepository<Author, UUID> {
 
-    List<Author> findByLastName(String lastName);
+    // ========================= FILTERS (PAGINATED) =========================
 
-    List<Author> findByFirstName(String firstName);
+    Page<Author> findByLastNameContainingIgnoreCase(
+            String lastName,
+            Pageable pageable
+    );
+
+    Page<Author> findByNationalityIgnoreCase(
+            String nationality,
+            Pageable pageable
+    );
+
+    Page<Author> findByLastNameContainingIgnoreCaseAndNationalityIgnoreCase(
+            String lastName,
+            String nationality,
+            Pageable pageable
+    );
 }

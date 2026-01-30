@@ -54,4 +54,16 @@ public class AuthorController {
     ) {
         return ResponseEntity.ok(authorService.patch(id, request));
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<Page<AuthorResponseDTO>> search(
+            @RequestParam(required = false) String lastName,
+            @RequestParam(required = false) String nationality,
+            Pageable pageable
+    ) {
+        return ResponseEntity.ok(
+                authorService.search(lastName, nationality, pageable)
+        );
+    }
+
 }

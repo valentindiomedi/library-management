@@ -72,4 +72,28 @@ public class UserService {
 
         return userMapper.toResponse(user);
     }
+
+    // ========================= FILTERED SEARCH =========================
+    public Page<UserResponseDTO> search(
+            UserStatus status,
+            String name,
+            Pageable pageable
+    ) {
+
+        if (status != null) {
+            return userRepository
+                    .findByStatus(status, pageable)
+                    .map(userMapper::toResponse);
+        }
+
+        if (name != null) {
+            return userRepository
+                    .findByNameContainingIgnoreCase(name, pageable)
+                    .map(userMapper::toResponse);
+        }
+
+        return userRepository
+                .findAll(pageable)
+                .map(userMapper::toResponse);
+    }
 }

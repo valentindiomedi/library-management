@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import com.example.library.management.dto.UserPatchDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import com.example.library.management.domain.UserStatus;
 
 import java.util.List;
 import java.util.UUID;
@@ -55,4 +56,16 @@ public class UserController {
     ) {
         return ResponseEntity.ok(userService.patch(id, request));
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<Page<UserResponseDTO>> search(
+            @RequestParam(required = false) UserStatus status,
+            @RequestParam(required = false) String name,
+            Pageable pageable
+    ) {
+        return ResponseEntity.ok(
+                userService.search(status, name, pageable)
+        );
+    }
+
 }

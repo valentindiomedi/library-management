@@ -80,4 +80,39 @@ public class AuthorService {
 
         return authorMapper.toResponse(author);
     }
+
+    // ========================= FILTERED SEARCH =========================
+    public Page<AuthorResponseDTO> search(
+            String lastName,
+            String nationality,
+            Pageable pageable
+    ) {
+
+        if (lastName != null && nationality != null) {
+            return authorRepository
+                    .findByLastNameContainingIgnoreCaseAndNationalityIgnoreCase(
+                            lastName,
+                            nationality,
+                            pageable
+                    )
+                    .map(authorMapper::toResponse);
+        }
+
+        if (lastName != null) {
+            return authorRepository
+                    .findByLastNameContainingIgnoreCase(lastName, pageable)
+                    .map(authorMapper::toResponse);
+        }
+
+        if (nationality != null) {
+            return authorRepository
+                    .findByNationalityIgnoreCase(nationality, pageable)
+                    .map(authorMapper::toResponse);
+        }
+
+        return authorRepository
+                .findAll(pageable)
+                .map(authorMapper::toResponse);
+    }
+
 }
